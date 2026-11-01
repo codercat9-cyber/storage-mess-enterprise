@@ -29,12 +29,13 @@ const http = require('http');
 const crypto = require('crypto');
 const ldap = require('ldapjs');
 
-const STATE_DIR = path.join(__dirname, 'state');
+// В контейнере состояние — на томе, слушаем все адреса (см. docker-compose.yml)
+const STATE_DIR = process.env.DEMO_STATE_DIR || path.join(__dirname, 'state');
 const STATE = path.join(STATE_DIR, 'directory.json');
 const PASSWORDS = path.join(STATE_DIR, 'passwords.txt');
 const LDAP_PORT = Number(process.env.DEMO_LDAP_PORT || 1389);
 const PANEL_PORT = Number(process.env.DEMO_PANEL_PORT || 9480);
-const HOST = '127.0.0.1';
+const HOST = process.env.DEMO_HOST || '127.0.0.1';
 
 const BASE = 'DC=corp,DC=example';
 const UPN = 'corp.example';
@@ -80,12 +81,17 @@ function newPerson(sam, name, dept, title, inGroup, admin) {
 function initState() {
   if (fs.existsSync(STATE)) return false;
   fs.mkdirSync(STATE_DIR, { recursive: true, mode: 0o700 });
-  const st = { svcPassword: pw(), people: PEOPLE.map(p => newPerson(...p)), computers: ['WS-001', 'WS-002'] };
+  const st = { svcPassword: process.env.DEMO_SVC_PASSWORD || pw(), people: PEOPLE.map(p => newPerson(...p)), computers: ['WS-001', 'WS-002'] };
   save(st);
   return true;
 }
 
-function load() { return JSON.parse(fs.readFileSync(STATE, 'utf8')); }
+function load() {
+  const st = JSON.parse(fs.readFileSync(STATE, 'utf8'));
+  // В контейнере пароль служебной учётки задаёт .env (тот же, что ENT_LDAP_BIND_PASSWORD у мессенджера)
+  if (process.env.DEMO_SVC_PASSWORD) st.svcPassword = process.env.DEMO_SVC_PASSWORD;
+  return st;
+}
 
 function save(st) {
   fs.writeFileSync(STATE + '.tmp', JSON.stringify(st, null, 1), { mode: 0o600 });

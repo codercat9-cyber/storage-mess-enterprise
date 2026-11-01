@@ -68,6 +68,17 @@ tools/demo-ad/stop-demo.sh
 
 С настоящим доменом: в `server/.env` — `ENT_DIRECTORY=ldap`, `ENT_LDAP_URL=ldaps://dc1.example.local`, служебная учётка только на чтение (`ENT_LDAP_BIND_DN`, `ENT_LDAP_BIND_PASSWORD`), `ENT_LDAP_BASE_DN`, `ENT_LDAP_GROUP_DN`. Полный список — `server/src/enterprise/config.ts`.
 
+## Docker
+
+Сервер и веб-клиент — один образ, база и файлы на томах:
+
+```bash
+./tools/docker/init-env.sh --demo            # .env со случайными секретами, под учебный AD
+docker compose --profile demo up -d --build  # мессенджер :8080 + учебный AD и RADIUS
+```
+
+Под настоящий каталог, HTTPS, звонки и бэкапы — [docs/DOCKER.md](docs/DOCKER.md).
+
 ## Честно о пределах
 
 - «Мгновенно» означает «за интервал опроса каталога»: в демо 10 с, в эксплуатации 30–60 с. Если нужно быстрее — DirSync или uSNChanged.

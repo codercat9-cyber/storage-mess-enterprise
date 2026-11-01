@@ -14,15 +14,18 @@ const dgram = require('dgram');
 const crypto = require('crypto');
 const radius = require('radius');
 
-const STATE_DIR = path.join(__dirname, 'state');
+// В контейнере состояние — на томе, слушаем все адреса (см. docker-compose.yml)
+const STATE_DIR = process.env.DEMO_STATE_DIR || path.join(__dirname, 'state');
 const SECRET_FILE = path.join(STATE_DIR, 'radius-secret');
 const PORT = Number(process.env.DEMO_RADIUS_PORT || 1812);
-const HOST = '127.0.0.1';
+const HOST = process.env.DEMO_HOST || '127.0.0.1';
 const NEVER = '9223372036854775807';
 const FILETIME_EPOCH_MS = 11644473600000n;
 const fromFiletime = s => (!s || s === '0' || s === NEVER ? null : Number(BigInt(s) / 10000n - FILETIME_EPOCH_MS));
 
 fs.mkdirSync(STATE_DIR, { recursive: true, mode: 0o700 });
+// Секрет можно задать снаружи (контейнер: тот же, что ENT_RADIUS_SECRET у мессенджера)
+if (process.env.DEMO_RADIUS_SECRET) { fs.mkdirSync(STATE_DIR, { recursive: true }); fs.writeFileSync(SECRET_FILE, process.env.DEMO_RADIUS_SECRET, { mode: 0o600 }); }
 if (!fs.existsSync(SECRET_FILE)) fs.writeFileSync(SECRET_FILE, crypto.randomBytes(24).toString('base64url'), { mode: 0o600 });
 const secret = fs.readFileSync(SECRET_FILE, 'utf8').trim();
 if (process.argv.includes('--init')) process.exit(0);

@@ -1,0 +1,16 @@
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+!server/.env.example
+server/data
+server/storage
+server/avatars
+server/logs
+server/certs
+tools/demo-ad/state
+**/*.log
+**/*.db
+**/*.pem
+**/*.key
+.git

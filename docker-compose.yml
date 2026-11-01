@@ -1,0 +1,49 @@
+# STORAGE&MESS Enterprise в контейнерах. Подробно — docs/DOCKER.md
+#
+#   ./tools/docker/init-env.sh            — один раз: .env со случайными секретами
+#   docker compose up -d --build          — мессенджер
+#   docker compose --profile demo up -d   — плюс учебный AD и RADIUS (показ без настоящего домена)
+
+name: storage-mess
+
+services:
+  messenger:
+    build: .
+    image: storage-mess-enterprise:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PORT: "8080"
+      HOST: "0.0.0.0"
+      LAN_DISCOVERY: "0"
+    ports:
+      - "${MESSENGER_PORT:-8080}:8080"
+      # Звонки: встроенный STUN и диапазон портов пересылки медиа
+      - "${LOCAL_STUN_PORT:-3478}:${LOCAL_STUN_PORT:-3478}/udp"
+      - "${LOCAL_RELAY_PORT_MIN:-50000}-${LOCAL_RELAY_PORT_MAX:-50100}:${LOCAL_RELAY_PORT_MIN:-50000}-${LOCAL_RELAY_PORT_MAX:-50100}/udp"
+    volumes:
+      - data:/app/server/data          # база и ключ УЦ устройств — бэкапить
+      - storage:/app/server/storage    # файлы — бэкапить
+      - avatars:/app/server/avatars
+      - logs:/app/server/logs
+      # HTTPS прямо в контейнере: fullchain.pem (или cert.pem) и key.pem в ./certs
+      # - ./certs:/app/server/certs:ro
+
+  demo-ad:
+    profiles: ["demo"]
+    build: tools/demo-ad
+    restart: unless-stopped
+    environment:
+      DEMO_SVC_PASSWORD: ${ENT_LDAP_BIND_PASSWORD:-}
+      DEMO_RADIUS_SECRET: ${ENT_RADIUS_SECRET:-}
+    ports:
+      - "127.0.0.1:9480:9480"          # консоль учебного AD: блокировать, отключать, создавать людей
+    volumes:
+      - demo-state:/demo/state
+
+volumes:
+  data:
+  storage:
+  avatars:
+  logs:
+  demo-state:
