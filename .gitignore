@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+server/data/
+server/storage/
+server/certs/
+server/logs/
+tools/demo-ad/state/
+*.log
+*.db
+*.pem
+*.key

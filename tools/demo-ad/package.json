@@ -1,0 +1,15 @@
+{
+  "name": "smess-demo-ad",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Учебный каталог в формате Active Directory (LDAP) и RADIUS для показа корпоративного контура STORAGE&MESS",
+  "scripts": {
+    "start": "./start-demo.sh",
+    "stop": "./stop-demo.sh",
+    "e2e": "node e2e.cjs"
+  },
+  "dependencies": {
+    "ldapjs": "^3.0.7",
+    "radius": "^1.1.4"
+  }
+}

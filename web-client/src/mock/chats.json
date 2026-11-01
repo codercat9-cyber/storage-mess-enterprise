@@ -1,0 +1,53 @@
+[
+  {
+    "id": "chat_1",
+    "user": {
+      "id": "user_1",
+      "name": "Алексей Петров",
+      "avatar": null,
+      "online": true
+    },
+    "lastMessage": {
+      "text": "Привет! Как дела с проектом?",
+      "timestamp": "2026-03-17T10:32:00Z",
+      "isOwn": false,
+      "isRead": true
+    },
+    "unreadCount": 0,
+    "isPinned": true
+  },
+  {
+    "id": "chat_2",
+    "user": {
+      "id": "user_2",
+      "name": "Мария Иванова",
+      "avatar": null,
+      "online": false
+    },
+    "lastMessage": {
+      "text": "Отправила файлы, проверь почту 📎",
+      "timestamp": "2026-03-17T09:15:00Z",
+      "isOwn": false,
+      "isRead": false
+    },
+    "unreadCount": 3,
+    "isPinned": false
+  },
+  {
+    "id": "chat_3",
+    "user": {
+      "id": "user_3",
+      "name": "Дмитрий Сидоров",
+      "avatar": null,
+      "online": true
+    },
+    "lastMessage": {
+      "text": "Ок, завтра созвонимся",
+      "timestamp": "2026-03-16T22:47:00Z",
+      "isOwn": true,
+      "isRead": true
+    },
+    "unreadCount": 0,
+    "isPinned": false
+  }
+]

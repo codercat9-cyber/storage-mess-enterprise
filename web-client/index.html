@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Облачное хранилище файлов — безопасное хранение документов, фото и медиа" />
+
+    <!-- PWA meta tags -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Storage" />
+    <meta name="application-name" content="Storage" />
+    <meta name="msapplication-TileColor" content="#0f172a" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <title>Storage Service</title>
+
+    <!-- Мгновенное восстановление масштаба UI из localStorage ДО загрузки React -->
+    <script>
+    (function(){
+      try{
+        // Способ 1: отдельный ключ (надёжный)
+        var direct=localStorage.getItem('ui-scale');
+        if(direct){
+          var v=parseInt(direct,10);
+          if(v>=10&&v<=24){
+            document.documentElement.style.fontSize=v+'px';
+            return;
+          }
+        }
+        // Способ 2: из Zustand persist store
+        var raw=localStorage.getItem('messenger-theme');
+        if(raw){
+          var s=JSON.parse(raw);
+          var st=s&&s.state;
+          if(st&&typeof st.uiScale==='number'&&st.uiScale>=10&&st.uiScale<=24){
+            document.documentElement.style.fontSize=st.uiScale+'px';
+          }
+        }
+      }catch(e){}
+    })();
+    </script>
+
+    <!-- Capacitor: убиваем SW от предыдущих APK — он кэширует старые бандлы и ломает загрузку -->
+    <script>
+    (function(){
+      // Если это APK, убиваем SW от предыдущих установок
+      var isApk = navigator.userAgent.includes('StorageMessApp') || location.hostname === 'localhost';
+      if(!isApk) return;
+      if(!('serviceWorker' in navigator))return;
+      if(!navigator.serviceWorker.controller)return;
+      // SW активен и перехватывает — чистим и перезагружаемся
+      navigator.serviceWorker.getRegistrations().then(function(r){
+        return Promise.all(r.map(function(s){return s.unregister()}));
+      }).then(function(){return caches.keys()}).then(function(n){
+        return Promise.all(n.map(function(c){return caches.delete(c)}));
+      }).then(function(){location.reload()});
+    })();
+    </script>
+  </head>
+  <body class="bg-messenger-bg">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
